@@ -19,8 +19,9 @@ public class PublisherConfig {
 
     @Bean
     public Queue queue() {
-        return new Queue(message, true);
+        return new Queue(message, true, false, false);
     }
+
 
     /**
      * Elimina todos los mensajes de la cola al iniciar la aplicación.

@@ -6,9 +6,11 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Component
 @EnableRabbit
 public class Publisher {
@@ -38,10 +40,17 @@ public class Publisher {
     }
 
     public CompletableFuture<Void> sendAsync(final Compra compra) {
-        return CompletableFuture.runAsync(() -> {
-            rabbitTemplate.convertAndSend(queue.getName(), compra);
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                rabbitTemplate.convertAndSend(queue.getName(), compra);
+                return null; // Devuelve nulo o algún resultado si es necesario
+            } catch (Exception e) {
+                log.error("Error al enviar la compra: " + e.getMessage());
+                throw new RuntimeException("Error al enviar la compra", e);
+            }
         });
     }
+
 
 
 }
